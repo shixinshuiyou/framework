@@ -4,7 +4,9 @@ import (
 	"io"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
 	"github.com/uber/jaeger-client-go"
 	"github.com/uber/jaeger-client-go/config"
 	"github.com/uber/jaeger-client-go/log"
@@ -13,8 +15,8 @@ import (
 
 const JaegerHostPort = "127.0.0.1:6831"
 
-// InitJaeger returns an instance of Jaeger Tracer that samples 100% of traces and logs all spans to stdout.
-func InitTracerJaeger(serviceName string) (opentracing.Tracer, io.Closer) {
+// initJaegerTracer returns an instance of Jaeger Tracer that samples 100% of traces and logs all spans to stdout.
+func initJaegerTracer(serviceName string) (opentracing.Tracer, io.Closer) {
 	cfg := &config.Configuration{
 		ServiceName: serviceName,
 		Sampler: &config.SamplerConfig{
@@ -40,4 +42,23 @@ func InitTracerJaeger(serviceName string) (opentracing.Tracer, io.Closer) {
 		config.MaxTagValueLength(65535),
 	)
 	return tracer, closer
+}
+
+//
+func OpenGinTracing(serviceName string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ginTracing, closer := initJaegerTracer(serviceName)
+		defer closer.Close()
+		spanCtx, _ := opentracing.GlobalTracer().Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(c.Request.Header))
+		span := opentracing.StartSpan(
+			c.Request.URL.Path,
+			opentracing.ChildOf(spanCtx),
+			opentracing.Tag{Key: string(ext.Component), Value: "Http"},
+			ext.SpanKindRPCServer,
+		)
+		defer span.Finish()
+		c.Set("tracer-context", ginTracing)
+		c.Set("span-context", span.Context())
+		c.Next()
+	}
 }
