@@ -19,7 +19,7 @@ func init() {
 }
 
 func GetEtcdAddrConf() []byte {
-	addrs := strings.Split(os.Getenv("ETCD_ADDR"), ",")
+	addrs := strings.Split(os.Getenv("gi"), ",")
 	etcdConfig := []byte(`{"etcdAddr": ["` + strings.Join(addrs, `","`) + `"]}`)
 	return etcdConfig
 }
