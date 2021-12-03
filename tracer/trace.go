@@ -9,10 +9,8 @@ import (
 	"github.com/uber/jaeger-client-go/config"
 )
 
-const JaegerHostPort = "127.0.0.1:6831"
-
 // InitJaegerTracer returns an instance of Jaeger Tracer that samples 100% of traces and logs all spans to stdout.
-func InitJaegerTracer(serviceName string) (opentracing.Tracer, io.Closer) {
+func InitJaegerTracer(serviceName, jaegerAddr string) (opentracing.Tracer, io.Closer, error) {
 	cfg := &config.Configuration{
 		ServiceName: serviceName,
 		Sampler: &config.SamplerConfig{
@@ -26,16 +24,19 @@ func InitJaegerTracer(serviceName string) (opentracing.Tracer, io.Closer) {
 		},
 	}
 
-	sender, _ := jaeger.NewUDPTransport(JaegerHostPort, 0)
+	sender, err := jaeger.NewUDPTransport(jaegerAddr, 0)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	reporter := jaeger.NewRemoteReporter(sender)
 	// Initialize tracer with a logger and a metrics factory
-	tracer, closer, _ := cfg.NewTracer(
+	tracer, closer, err := cfg.NewTracer(
 		config.Reporter(reporter),
 		// config.Logger(log.StdLogger),
 		// config.Metrics(metrics.NullFactory),
 		// 设置最大 Tag 长度，根据情况设置
 		// config.MaxTagValueLength(65535),
 	)
-	return tracer, closer
+	return tracer, closer, err
 }
