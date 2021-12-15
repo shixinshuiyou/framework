@@ -24,7 +24,9 @@ func InitLoggerJson(tag string) {
 	logAddr := ""
 	runEnv := os.Getenv("run_env")
 	logrus.SetFormatter(&logrus.JSONFormatter{})
-	Logger = logrus.WithField("env", os.Getenv("run_env"))
+	Logger = logrus.WithFields(logrus.Fields{
+		"env": runEnv,
+	})
 	if runEnv == ENV_PROD {
 		// 往日志管理平台输送日志
 		syslog.NewSyslogHook("udp", logAddr, sys.LOG_INFO, tag)
@@ -39,7 +41,7 @@ func InitLoggerJson(tag string) {
 func InitLoggerText() {
 	runEnv := os.Getenv("run_env")
 	logrus.SetFormatter(&logrus.TextFormatter{})
-	Logger = logrus.WithField("env", os.Getenv("run_env"))
+	Logger = logrus.WithField("env", runEnv)
 	if runEnv == ENV_PROD {
 		// 关闭标准日志输出
 		logrus.SetOutput(ioutil.Discard)

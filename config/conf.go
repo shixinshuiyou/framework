@@ -4,8 +4,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/asim/go-micro/v3/config"
-	"github.com/asim/go-micro/v3/config/source/memory"
+	"github.com/micro/go-micro/v2/config"
+	"github.com/micro/go-micro/v2/config/source/memory"
 )
 
 var Conf = config.DefaultConfig
