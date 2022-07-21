@@ -1,6 +1,6 @@
 module github.com/shixinshuiyou/framework
 
-go 1.14
+go 1.17
 
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
@@ -11,4 +11,6 @@ require (
 	github.com/uber/jaeger-client-go v2.25.0+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	go.uber.org/atomic v1.9.0 // indirect
+	gorm.io/driver/mysql v1.3.2
+	gorm.io/gorm v1.23.3
 )
