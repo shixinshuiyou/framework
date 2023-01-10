@@ -1,7 +1,7 @@
 package netx_test
 
 import (
-	"framework/netx"
+	"github.com/shixinshuiyou/framework/netx"
 	"testing"
 )
 

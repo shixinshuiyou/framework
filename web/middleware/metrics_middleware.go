@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"framework/netx"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/shixinshuiyou/framework/netx"
 	"net/http"
 	"strconv"
 	"time"

@@ -1,10 +1,10 @@
 package server
 
 import (
-	"framework/trace"
-	"framework/web/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/shixinshuiyou/framework/trace"
+	"github.com/shixinshuiyou/framework/web/middleware"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )

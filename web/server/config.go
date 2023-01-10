@@ -1,8 +1,8 @@
 package server
 
 import (
-	"framework/log"
-	"framework/trace"
+	"github.com/shixinshuiyou/framework/log"
+	"github.com/shixinshuiyou/framework/trace"
 	"time"
 )
 

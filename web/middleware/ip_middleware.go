@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"fmt"
-	"framework/netx"
 	"github.com/gin-gonic/gin"
+	"github.com/shixinshuiyou/framework/netx"
 	"os"
 )
 

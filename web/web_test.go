@@ -1,8 +1,8 @@
 package web
 
 import (
-	"framework/web/server"
 	"github.com/gin-gonic/gin"
+	"github.com/shixinshuiyou/framework/web/server"
 	"testing"
 )
 
