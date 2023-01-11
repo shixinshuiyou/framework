@@ -9,9 +9,9 @@ import (
 func TestStatusServer(t *testing.T) {
 	config := server.Config{
 		Mode:           server.ModeDebug,
-		Name:           "web_test",
+		Name:           "czhTest",
 		MainSrvConf:    server.WebServerConfig{Host: "0.0.0.0", Port: 10013},
-		StatusSrvConf:  server.WebServerConfig{Host: "0.0.0.0", Port: 10014},
+		StatusSrvConf:  server.WebServerConfig{Host: "0.0.0.0", Port: 10011},
 		CollectMetrics: true,
 	}
 	server := server.NewServer(config)
@@ -34,6 +34,6 @@ func TestStatusServer(t *testing.T) {
 
 	//	resp, err := http.Get("http://127.0.0.1:10013/test1")
 	//	resp, err := http.Get("http://127.0.0.1:10013/test2")
-	//	httpResp, err := http.Get("http://127.0.0.1:10014/metrics")
+	//	httpResp, err := http.Get("http://127.0.0.1:10010/metrics")
 
 }
