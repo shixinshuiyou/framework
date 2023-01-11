@@ -6,6 +6,7 @@ import (
 	"github.com/shixinshuiyou/framework/trace"
 	"github.com/shixinshuiyou/framework/web/middleware"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -56,7 +57,7 @@ func (srv *Server) initLog() {
 	// TODO trace日志
 	if srv.config.TraceConf != trace.EmptyConfig {
 		trace.NewJaegerTracer(srv.config.TraceConf)
-		//srv.mainServer.Use(otelgin.Middleware(srv.config.Name))
+		srv.mainServer.Use(otelgin.Middleware(srv.config.Name))
 	}
 }
 
