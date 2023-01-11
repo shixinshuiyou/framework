@@ -38,7 +38,7 @@ func (srv *Server) Start() {
 	srv.initLog()
 	srv.initRouter()
 	srv.errGroup.Go(srv.mainServer.ListenAndServe)
-	// TODO 后续切换成信号量控制
+	// 后续切换成信号量控制
 	srv.errGroup.Go(func() error {
 		select {}
 	})
@@ -54,9 +54,12 @@ func (srv *Server) Start() {
 func (srv *Server) initLog() {
 	// 注册Recovery:日志和方法
 	srv.mainServer.Use(gin.RecoveryWithWriter(logrus.StandardLogger().Out, middleware.RecoveryMetric))
-	// TODO trace日志
+	// gin-trace
 	if srv.config.TraceConf != trace.EmptyConfig {
-		trace.NewJaegerTracer(srv.config.TraceConf)
+		_, err := trace.NewJaegerTracer(srv.config.TraceConf)
+		if err != nil {
+			logrus.WithError(err).Panic("jaeger tracer init fail")
+		}
 		srv.mainServer.Use(otelgin.Middleware(srv.config.Name))
 	}
 }

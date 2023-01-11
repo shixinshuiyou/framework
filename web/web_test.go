@@ -2,16 +2,23 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/shixinshuiyou/framework/trace"
 	"github.com/shixinshuiyou/framework/web/server"
 	"testing"
 )
 
 func TestStatusServer(t *testing.T) {
 	config := server.Config{
-		Mode:           server.ModeDebug,
-		Name:           "czhTest",
-		MainSrvConf:    server.WebServerConfig{Host: "0.0.0.0", Port: 10013},
-		StatusSrvConf:  server.WebServerConfig{Host: "0.0.0.0", Port: 10011},
+		Mode:          server.ModeDebug,
+		Name:          "czhTest",
+		MainSrvConf:   server.WebServerConfig{Host: "0.0.0.0", Port: 10013},
+		StatusSrvConf: server.WebServerConfig{Host: "0.0.0.0", Port: 10011},
+		TraceConf: trace.Config{
+			Host:        "127.0.0.1",
+			Port:        6831,
+			ServiceName: "czhTest",
+			Ratio:       1,
+		},
 		CollectMetrics: true,
 	}
 	server := server.NewServer(config)

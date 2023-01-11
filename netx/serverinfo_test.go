@@ -49,38 +49,6 @@ func TestLong2ip(t *testing.T) {
 	}
 }
 
-func TestArch(t *testing.T) {
-	tests := []struct {
-		name string
-		want string
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := netx.Arch(); got != tt.want {
-				t.Errorf("Arch() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestHostname(t *testing.T) {
-	tests := []struct {
-		name string
-		want string
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := netx.Hostname(); got != tt.want {
-				t.Errorf("Hostname() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestIDC(t *testing.T) {
 	t.Log(netx.IDC())
 }
