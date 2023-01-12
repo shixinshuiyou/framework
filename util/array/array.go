@@ -1,4 +1,4 @@
-package util
+package array
 
 func InArray(target string, arr []string) bool {
 	for _, v := range arr {
