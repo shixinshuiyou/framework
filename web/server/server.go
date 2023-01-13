@@ -1,22 +1,27 @@
 package server
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/shixinshuiyou/framework/signal"
 	"github.com/shixinshuiyou/framework/trace"
 	"github.com/shixinshuiyou/framework/web/middleware"
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"golang.org/x/sync/errgroup"
+	"os"
+	"syscall"
+	"time"
 )
 
 type Server struct {
-	config       Config     // 配置
-	mainServer   *ginServer // 应用服务
-	statusServer *ginServer // 状态服务
-	//signalTable  *signal.SignalTable // 信号表
-	chServerStop chan struct{}  // 服务停止信号
-	errGroup     errgroup.Group // 管理服务的启动
+	config       Config            // 配置
+	mainServer   *ginServer        // 应用服务
+	statusServer *ginServer        // 状态服务
+	signalTable  *signal.SignTable // 信号表
+	chServerStop chan struct{}     // 服务停止信号
+	errGroup     errgroup.Group    // 管理服务的启动
 }
 
 func NewServer(config Config) *Server {
@@ -31,6 +36,16 @@ func NewServer(config Config) *Server {
 	if config.StatusSrvConf.Port > 0 {
 		srv.statusServer = newGinServer(config.StatusSrvConf)
 	}
+
+	// default signal handler
+	srv.signalTable = signal.NewSignTable()
+	srv.signalTable.Register(syscall.SIGHUP, signal.IgnoreHandler)  // kill -1 is syscall.SIGHUP
+	srv.signalTable.Register(syscall.SIGINT, srv.shutdownHandler)   // kill -2 is syscall.SIGINT
+	srv.signalTable.Register(syscall.SIGQUIT, srv.shutdownHandler)  // kill -3 is syscall.SIGQUIT
+	srv.signalTable.Register(syscall.SIGILL, signal.IgnoreHandler)  // kill -4 is syscall.SIGILL
+	srv.signalTable.Register(syscall.SIGTRAP, signal.IgnoreHandler) // kill -5 is syscall.SIGTRAP
+	srv.signalTable.Register(syscall.SIGABRT, signal.IgnoreHandler) // kill -6 is syscall.SIGABRT
+	srv.signalTable.Register(syscall.SIGTERM, signal.TermHandler)   // kill -15 is syscall SIGTERM
 	return srv
 }
 
@@ -38,17 +53,15 @@ func (srv *Server) Start() {
 	srv.initLog()
 	srv.initRouter()
 	srv.errGroup.Go(srv.mainServer.ListenAndServe)
-	// 后续切换成信号量控制
-	srv.errGroup.Go(func() error {
-		select {}
-	})
 	if srv.statusServer != nil {
 		srv.statusServer.ListenAndServe()
 	}
+	srv.initSignTable()
 	if err := srv.errGroup.Wait(); err != nil {
 		logrus.WithError(err).Panic("server init fault")
 		return
 	}
+
 }
 
 func (srv *Server) initLog() {
@@ -92,4 +105,29 @@ func (srv *Server) SetMainRouterFunc(fn func(*gin.Engine)) {
 // SetStatusRouterFunc 添加状态服务钩子
 func (srv *Server) SetStatusRouterFunc(fn func(*gin.Engine)) {
 	srv.statusServer.RouterFunc = fn
+}
+
+func (srv *Server) initSignTable() {
+	srv.signalTable.StartSignalHandler()
+}
+
+// 关闭服务处理器
+func (srv *Server) shutdownHandler(s os.Signal) {
+	srv.Shutdown()
+}
+
+func (srv *Server) Shutdown() {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.mainServer.Shutdown(ctx); err != nil {
+		logrus.WithError(err).Panic("main Server Shutdown fail")
+	}
+	if srv.statusServer != nil {
+		if err := srv.statusServer.Shutdown(ctx); err != nil {
+			logrus.WithError(err).Panic("Status Server Shutdown fail")
+		}
+	}
+	<-ctx.Done()
+	srv.signalTable.Shutdown()
+	logrus.Println("server exiting")
 }
