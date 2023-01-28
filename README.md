@@ -9,11 +9,11 @@
 | profile    | 性能检测工具                                         |     |
 | threading  | 协程组件包，来源 go-zero                               | 已完成 |
 | timex      | 支持日期维度，或者标准时间维度的类型                             | 已完成 |
-| signal     | 信号处理模块,将服务的所有信号统一处理                            | 待建设 |
+| signal     | 信号处理模块,将服务的所有信号统一处理                            | 已完成 |
 | redisx     | redis 查询                                       |     |
 | log        | 基于 logrus 开发的日志组件，支持上传 es，支持gorm 日志采集等         | 已完成 |
 | db         | db 库，提供了MySQL，Mongo 的链接封装，并提供了MySQL的通用Model    |     |
 | config     | 支持 ini/yaml 等配置文件加载                            |     |
 | collection | 集合操作：支持先进先出队列，环形队列，滚动窗口，集合，时间片轮转。来源 go-zero 仓库 |     |
-| web        | 基于gin的web服务                                    | 建设中 |
+| web        | 基于gin的web服务                                    | 已完成 |
 | trace      | 基于jaeger的链路追踪服务                                | 已完成 |
