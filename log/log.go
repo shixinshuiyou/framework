@@ -8,7 +8,18 @@ import (
 
 var Logger *logrus.Entry
 
+func init() {
+	defaultConf := Config{
+		ServerTag: "dev",
+		Level:     logrus.InfoLevel,
+	}
+	InitLogger(defaultConf)
+}
+
 func InitLogger(conf Config) *logrus.Entry {
+	if conf.ServerTag == "" {
+		conf.ServerTag = "dev"
+	}
 	logrus.SetLevel(conf.Level)
 	logrus.SetFormatter(&logrus.TextFormatter{})
 	logrus.SetReportCaller(true)

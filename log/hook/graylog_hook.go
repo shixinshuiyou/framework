@@ -23,7 +23,6 @@ func NewGraylogHook(conf GrayLogConfig) (hook GraylogHook) {
 	case "udp":
 		hook.writer, err = gelf.NewUDPWriter(conf.Addr)
 	case "tcp":
-	default:
 		hook.writer, err = gelf.NewTCPWriter(conf.Addr)
 	}
 	if err != nil {

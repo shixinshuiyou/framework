@@ -4,10 +4,10 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/shixinshuiyou/framework/log"
 	"github.com/shixinshuiyou/framework/signal"
 	"github.com/shixinshuiyou/framework/trace"
 	"github.com/shixinshuiyou/framework/web/middleware"
-	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"golang.org/x/sync/errgroup"
 	"os"
@@ -58,20 +58,21 @@ func (srv *Server) Start() {
 	}
 	srv.initSignTable()
 	if err := srv.errGroup.Wait(); err != nil {
-		logrus.WithError(err).Panic("server init fault")
+		log.Logger.Error("server init fault")
 		return
 	}
 
 }
 
 func (srv *Server) initLog() {
+	log.InitLogger(srv.config.LogConf)
 	// 注册Recovery:日志和方法
-	srv.mainServer.Use(gin.RecoveryWithWriter(logrus.StandardLogger().Out, middleware.RecoveryMetric))
+	srv.mainServer.Use(gin.RecoveryWithWriter(log.Logger.Writer(), middleware.RecoveryMetric))
 	// gin-trace
 	if srv.config.TraceConf != trace.EmptyConfig {
 		_, err := trace.NewJaegerTracer(srv.config.TraceConf)
 		if err != nil {
-			logrus.WithError(err).Panic("jaeger tracer init fail")
+			log.Logger.Panic("jaeger tracer init fail")
 		}
 		srv.mainServer.Use(otelgin.Middleware(srv.config.Name))
 	}
@@ -120,14 +121,14 @@ func (srv *Server) Shutdown() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := srv.mainServer.Shutdown(ctx); err != nil {
-		logrus.WithError(err).Panic("main Server Shutdown fail")
+		log.Logger.Error("main Server Shutdown fail")
 	}
 	if srv.statusServer != nil {
 		if err := srv.statusServer.Shutdown(ctx); err != nil {
-			logrus.WithError(err).Panic("Status Server Shutdown fail")
+			log.Logger.Error("Status Server Shutdown fail")
 		}
 	}
 	<-ctx.Done()
 	srv.signalTable.Shutdown()
-	logrus.Println("server exiting")
+	log.Logger.Info("server exiting")
 }
