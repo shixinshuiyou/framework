@@ -31,6 +31,7 @@ func (c *callbacks) after(db *gorm.DB, operate string) {
 		return
 	}
 	sp := val.(trace.Span)
+	defer sp.End()
 
 	sp.SetAttributes(
 		attribute.String("db.table", db.Statement.Table),
@@ -60,12 +61,10 @@ func (c *callbacks) registerCallbacks(db *gorm.DB, operate string) {
 		})
 	case operateQuery:
 		db.Callback().Query().Before(gormCallbackName).Register(beforeOperateName, func(db *gorm.DB) {
-			log.Logger.Info("++++++++++++")
 			c.before(db)
 		})
 		db.Callback().Query().After(gormCallbackName).Register(afterOperateName, func(db *gorm.DB) {
 			c.after(db, operate)
-			log.Logger.Info("-------------")
 		})
 	case operateUpdate:
 		db.Callback().Update().Before(gormCallbackName).Register(beforeOperateName, func(db *gorm.DB) {
