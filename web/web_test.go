@@ -29,9 +29,13 @@ func TestStatusServer(t *testing.T) {
 		},
 		CollectMetrics: true,
 	}
-	server := server.NewServer(config)
+	nemServer := server.NewServer(config)
 	dbConf := database.DatabaseConfig{
 		Type:          "mysql",
+		User:          "root",
+		Password:      "chen360622",
+		Host:          "127.0.0.1:3306",
+		Name:          "mayo",
 		MaxIdle:       2,
 		MaxOpen:       10,
 		LogLevel:      logrus.InfoLevel,
@@ -41,11 +45,10 @@ func TestStatusServer(t *testing.T) {
 	db, _ := dbConf.InitDB()
 	database.AddGormCallbacks(db, config.Name)
 
-	server.SetMainRouterFunc(func(engine *gin.Engine) {
+	nemServer.SetMainRouterFunc(func(engine *gin.Engine) {
 		engine.GET("/test1", func(context *gin.Context) {
 			var name string
-			db.WithContext(context).Table("advertiser").Raw("select name from advertiser where id = ?", 387528).First(&name)
-
+			db.WithContext(context.Request.Context()).Table("mayo_user").Raw("select username from mayo_user where id = ?", 1).First(&name)
 			context.JSONP(200, map[string]interface{}{
 				"code": 0,
 				"mes":  "hello " + name,
@@ -58,8 +61,11 @@ func TestStatusServer(t *testing.T) {
 			})
 		})
 	})
+	nemServer.SetStatusRouterFunc(func(engine *gin.Engine) {
+		// 可以接入prometheus、或者热力图
+	})
 
-	server.Start()
+	nemServer.Start()
 
 	//	resp, err := http.Get("http://127.0.0.1:10013/test1")
 	//	resp, err := http.Get("http://127.0.0.1:10013/test2")
