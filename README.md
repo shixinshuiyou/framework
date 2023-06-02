@@ -17,3 +17,4 @@
 | collection | 集合操作：支持先进先出队列，环形队列，滚动窗口，集合，时间片轮转。来源 go-zero 仓库 |     |
 | web        | 基于gin的web服务                                    | 已完成 |
 | trace      | 基于jaeger的链路追踪服务                                | 已完成 |
+| util/api   | 基于配置自动注入外部接口（支持GET/POST）请求                     | 已完成 |
