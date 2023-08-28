@@ -33,7 +33,7 @@ func TestStatusServer(t *testing.T) {
 	dbConf := database.DatabaseConfig{
 		Type:          "mysql",
 		User:          "root",
-		Password:      "chen360622",
+		Password:      "123456",
 		Host:          "127.0.0.1:3306",
 		Name:          "mayo",
 		MaxIdle:       2,
