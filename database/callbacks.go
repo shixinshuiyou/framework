@@ -1,6 +1,7 @@
 package database
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/shixinshuiyou/framework/log"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -21,7 +22,12 @@ type callbacks struct {
 }
 
 func (c *callbacks) before(db *gorm.DB) {
-	_, sp := otel.Tracer(c.serverName).Start(db.Statement.Context, "db-"+db.Statement.Table)
+	var sp trace.Span
+	if dbContext, ok := db.Statement.Context.(*gin.Context); ok {
+		_, sp = otel.Tracer(c.serverName).Start(dbContext.Request.Context(), c.serverName+"-db-"+db.Statement.Table)
+	} else {
+		_, sp = otel.Tracer(c.serverName).Start(db.Statement.Context, c.serverName+"-db-"+db.Statement.Table)
+	}
 	db.Set(spanGormKey, sp)
 }
 
@@ -41,7 +47,7 @@ func (c *callbacks) after(db *gorm.DB, operate string) {
 	)
 	// sql执行失败
 	if db.Error != nil {
-		sp.SetAttributes()
+		sp.SetAttributes(attribute.String("db.error", db.Error.Error()))
 	}
 }
 

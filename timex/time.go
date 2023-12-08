@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// type Day time.Time
+// Time type Day time.Time
 type Time struct {
 	time.Time
 }
