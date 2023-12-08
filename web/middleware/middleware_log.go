@@ -23,7 +23,7 @@ func (w CustomResponseWriter) Write(b []byte) (int, error) {
 	return w.ResponseWriter.Write(b)
 }
 
-func MiddlewareLogger() gin.HandlerFunc {
+func LogMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		traceID := c.GetHeader(_const.TraceID)
 		if traceID == "" {

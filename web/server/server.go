@@ -8,6 +8,7 @@ import (
 	"github.com/shixinshuiyou/framework/signal"
 	"github.com/shixinshuiyou/framework/trace"
 	"github.com/shixinshuiyou/framework/web/middleware"
+	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"golang.org/x/sync/errgroup"
 	"os"
@@ -58,7 +59,7 @@ func (srv *Server) Start() {
 	}
 	srv.initSignTable()
 	if err := srv.errGroup.Wait(); err != nil {
-		log.Logger.Error("server init fault")
+		logrus.Error("server init fault")
 		return
 	}
 
@@ -67,12 +68,12 @@ func (srv *Server) Start() {
 func (srv *Server) initLog() {
 	log.InitLogger(srv.config.LogConf)
 	// 注册Recovery:日志和方法
-	srv.mainServer.Use(gin.RecoveryWithWriter(log.Logger.Writer(), middleware.RecoveryMetric))
+	srv.mainServer.Use(gin.RecoveryWithWriter(logrus.WithField("srv_name", "").Writer(), middleware.RecoveryMetric))
 	// gin-trace
 	if srv.config.TraceConf != trace.EmptyConfig {
 		_, err := trace.InitJaegerTracer(srv.config.TraceConf)
 		if err != nil {
-			log.Logger.Panic("jaeger tracer init fail")
+			logrus.Panic("jaeger tracer init fail")
 		}
 		srv.mainServer.Use(otelgin.Middleware(srv.config.Name))
 	}
@@ -121,14 +122,14 @@ func (srv *Server) Shutdown() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := srv.mainServer.Shutdown(ctx); err != nil {
-		log.Logger.Error("main Server Shutdown fail")
+		logrus.Error("main Server Shutdown fail")
 	}
 	if srv.statusServer != nil {
 		if err := srv.statusServer.Shutdown(ctx); err != nil {
-			log.Logger.Error("Status Server Shutdown fail")
+			logrus.Error("Status Server Shutdown fail")
 		}
 	}
 	<-ctx.Done()
 	srv.signalTable.Shutdown()
-	log.Logger.Info("server exiting")
+	logrus.Info("server exiting")
 }

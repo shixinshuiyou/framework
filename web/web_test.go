@@ -18,8 +18,8 @@ func TestStatusServer(t *testing.T) {
 		MainSrvConf:   server.WebServerConfig{Host: "0.0.0.0", Port: 10013},
 		StatusSrvConf: server.WebServerConfig{Host: "0.0.0.0", Port: 10011},
 		LogConf: log.Config{
-			ServerName: "test_local",
-			Level:      logrus.InfoLevel,
+			AppFlag: "test_local",
+			Level:   logrus.InfoLevel,
 		},
 		TraceConf: trace.Config{
 			Host:        "127.0.0.1",
