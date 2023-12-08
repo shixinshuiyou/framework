@@ -70,7 +70,7 @@ func (srv *Server) initLog() {
 	srv.mainServer.Use(gin.RecoveryWithWriter(log.Logger.Writer(), middleware.RecoveryMetric))
 	// gin-trace
 	if srv.config.TraceConf != trace.EmptyConfig {
-		_, err := trace.NewJaegerTracer(srv.config.TraceConf)
+		_, err := trace.InitJaegerTracer(srv.config.TraceConf)
 		if err != nil {
 			log.Logger.Panic("jaeger tracer init fail")
 		}

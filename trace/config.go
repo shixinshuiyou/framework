@@ -1,6 +1,7 @@
 package trace
 
 import (
+	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/propagation"
@@ -19,11 +20,12 @@ type Config struct {
 	Ratio       float64
 }
 
-func NewJaegerTracer(config Config) (*trace.TracerProvider, error) {
+func InitJaegerTracer(config Config) (*trace.TracerProvider, error) {
 	exporter, err := jaeger.New(jaeger.WithAgentEndpoint(jaeger.WithAgentHost(config.Host), jaeger.WithAgentPort(strconv.Itoa(config.Port))))
 	if err != nil {
 		return nil, err
 	}
+	logrus.Debugf("init jaeger %s:%d", config.Host, config.Port)
 	provider := trace.NewTracerProvider(
 		trace.WithSampler(trace.TraceIDRatioBased(config.Ratio)),
 		trace.WithBatcher(exporter),

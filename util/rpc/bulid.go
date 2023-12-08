@@ -3,7 +3,6 @@ package rpc
 import (
 	"context"
 	"encoding/json"
-	"github.com/shixinshuiyou/framework/conv"
 	"github.com/shixinshuiyou/framework/log"
 	"github.com/sirupsen/logrus"
 	"reflect"
@@ -61,7 +60,7 @@ func (api *BuildApi) Method(field reflect.StructField) reflect.Value {
 		reqParams := map[string]string{}
 		method := api.Methods[field.Name]
 		for i, v := range method.Params {
-			reqParams[v] = conv.String(params[i+1].Interface())
+			reqParams[v] = version.String(params[i+1].Interface())
 		}
 
 		start := time.Now()

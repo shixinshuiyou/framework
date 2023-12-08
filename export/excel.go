@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"html"
 
-	"github.com/shixinshuiyou/framework/conv"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -64,13 +63,13 @@ func Excel03(data [][]interface{}, rowHighlight []bool) *bytes.Buffer {
 		if len(rowHighlight) > i && rowHighlight[i] {
 			for _, cell := range row {
 				buffer.WriteString(`<th style="background-color:#F2FAFF;white-space:nowrap;">`)
-				buffer.WriteString(html.EscapeString(conv.String(cell)))
+				buffer.WriteString(html.EscapeString(version.String(cell)))
 				buffer.WriteString(`</th>`)
 			}
 		} else {
 			for _, cell := range row {
 				buffer.WriteString(`<td>`)
-				buffer.WriteString(html.EscapeString(conv.String(cell)))
+				buffer.WriteString(html.EscapeString(version.String(cell)))
 				buffer.WriteString(`</td>`)
 			}
 		}
